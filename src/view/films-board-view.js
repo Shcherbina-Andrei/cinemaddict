@@ -3,20 +3,22 @@ import {createElement} from '../render.js';
 const createFilmsBoardTemplate = () => '<section class="films"></section>';
 
 export default class FilmsBoardView {
-  getTemplate() {
+  #element = null;
+
+  get template() {
     return createFilmsBoardTemplate();
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   deleteElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
 

@@ -1,12 +1,16 @@
 import {generateComments} from '../mock/comments.js';
 
 export default class CommentsModel {
+  #comments = null;
+
   constructor(filmsModel) {
-    this.films = filmsModel.getFilms();
-    this.comments = generateComments(this.films);
+    this.films = filmsModel.films;
+    this.#comments = generateComments(this.films);
   }
 
-  getComments = () => this.comments;
+  get comments() {
+    return this.#comments;
+  }
 
-  getCurrentComments = (film) => film.comments.map((id) => this.comments.find((comment) => comment.id === id));
+  getCurrentComments = (film) => film.comments.map((id) => this.#comments.find((comment) => comment.id === id));
 }

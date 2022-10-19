@@ -3,19 +3,21 @@ import {createElement} from '../render.js';
 const createLoadingTemplate = () => '<h2 class="films-list__title">Loading...</h2>';
 
 export default class LoadingView {
-  getTemplate() {
+  #element = null;
+
+  get template() {
     return createLoadingTemplate();
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   deleteElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
