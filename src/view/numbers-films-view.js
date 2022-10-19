@@ -3,19 +3,21 @@ import {createElement} from '../render.js';
 const createFooterTemplate = () => '<p>130 291 movies inside</p>';
 
 export default class NumbersFilmsView {
-  getTemplate() {
+  #element = null;
+
+  get template() {
     return createFooterTemplate();
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   deleteElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

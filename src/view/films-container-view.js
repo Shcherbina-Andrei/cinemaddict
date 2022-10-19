@@ -3,19 +3,21 @@ import {createElement} from '../render.js';
 const createFilmsContainerElement = () => '<div class="films-list__container"></div>';
 
 export default class FilmsContainerView {
-  getTemplate() {
+  #element = null;
+
+  get template() {
     return createFilmsContainerElement();
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(createFilmsContainerElement());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   deleteElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
