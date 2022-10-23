@@ -20,6 +20,12 @@ const generateFilmInfo = () => ({
   runtime: dayjs.duration(100, 'm').toISOString(),
   genre: getGenre(),
   description: getDescription(),
+  userDetails: {
+    watchlist: Boolean(getRandomInteger(0 ,1)),
+    alreadyWatched: Boolean(getRandomInteger(0 ,1)),
+    watchingDate: dayjs().subtract(getRandomInteger(1, 30), 'day').toISOString(),
+    favorite: Boolean(getRandomInteger(0 ,1))
+  }
 });
 
 const generateFilms = (filmsCount) => {
