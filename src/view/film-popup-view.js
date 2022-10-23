@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import {formatFullDate} from '../utils.js';
 import {formatSlashDate} from '../utils.js';
 import {formatDuration} from '../utils.js';
@@ -143,12 +143,12 @@ const createFilmPopupTemplate = (film, currentComments) => {
   </section>`;
 };
 
-export default class FilmPopupView {
+export default class FilmPopupView extends AbstractView {
   #film = null;
   #comments = null;
-  #element = null;
 
   constructor(film, comments) {
+    super();
     this.#film = film;
     this.#comments = comments;
   }
@@ -157,16 +157,14 @@ export default class FilmPopupView {
     return createFilmPopupTemplate(this.#film, this.#comments);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
+  setClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.film-details__close-btn').addEventListener('click', this.#clickHandler);
+  };
 
-    return this.#element;
-  }
-
-  deleteElement() {
-    this.#element = null;
-  }
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 }
 

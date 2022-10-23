@@ -36,15 +36,13 @@ export default class FilmsBoardPresenter {
     this.#renderBoardFilms();
   };
 
-  #handleLoadMoreButtonClick = (evt) => {
-    evt.preventDefault();
-
+  #handleLoadMoreButtonClick = () => {
     this.#boardFilms.slice(this.#renderedFilmsCount, this.#renderedFilmsCount + FILM_COUNT_PER_STEP)
       .forEach((film) => this.#renderCard(film));
     this.#renderedFilmsCount += FILM_COUNT_PER_STEP;
     if (this.#renderedFilmsCount >= this.#boardFilms.length) {
       this.#buttonShowMoreComponent.element.remove();
-      this.#buttonShowMoreComponent.deleteElement();
+      this.#buttonShowMoreComponent.removeElement();
     }
   };
 
@@ -70,14 +68,13 @@ export default class FilmsBoardPresenter {
       }
     };
 
-    filmComponent.element.querySelector('.film-card__link').addEventListener('click', (evt) => {
-      evt.preventDefault();
+    filmComponent.setClickHandler(() => {
       openPopup();
       document.querySelector('body').classList.add('hide-overflow');
       document.addEventListener('keydown', onEscKeyDown);
     });
 
-    filmPopupComponent.element.querySelector('.film-details__close-btn').addEventListener('click', () => {
+    filmPopupComponent.setClickHandler(() => {
       closePopup();
       document.querySelector('body').classList.remove('hide-overflow');
       document.removeEventListener('keydown', onEscKeyDown);
@@ -100,7 +97,7 @@ export default class FilmsBoardPresenter {
       if (this.#boardFilms.length > FILM_COUNT_PER_STEP) {
         render(this.#buttonShowMoreComponent, this.#filmsListComponent.element);
 
-        this.#buttonShowMoreComponent.element.addEventListener('click', this.#handleLoadMoreButtonClick);
+        this.#buttonShowMoreComponent.setClickHandler(this.#handleLoadMoreButtonClick);
       }
     }
   };
