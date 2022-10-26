@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration.js';
+import {nanoid} from 'nanoid';
 import {getRandomInteger, getRandomNumber} from '../utils.js';
 import {getTitle, getAlternativeTitle, getDirector, getActors, getGenre, getWriters, getReleaseCountry, getDescription, getPoster} from './const.js';
 dayjs.extend(duration);
@@ -33,13 +34,13 @@ const generateFilms = (filmsCount) => {
 
   let totalCommentsCount = 0;
 
-  return films.map((film, index) => {
+  return films.map((film) => {
     const hasFilmComments = getRandomInteger(0, 1);
     const filmsCommentsCount = (hasFilmComments) ? getRandomInteger(1, 5) : 0;
     totalCommentsCount += filmsCommentsCount;
 
     return {
-      id: String(index + 1),
+      id: nanoid(),
       comments: (hasFilmComments) ? Array.from({length: filmsCommentsCount},(_value, commentIndex) => String(totalCommentsCount - commentIndex)) : [],
       filmInfo: film
     };

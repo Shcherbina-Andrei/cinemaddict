@@ -91,8 +91,8 @@ const createCommentsListTemplate = (comments) => {
 
 const createCommentsTemplate = (comments) => `
     <section class="film-details__comments-wrap">
-      <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3
-      ${createCommentsListTemplate(comments)}
+      <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments ? comments.length : '0'}</span></h3
+      ${comments ? createCommentsListTemplate(comments) : ''}
       <form class="film-details__new-comment" action="" method="get">
         <div class="film-details__add-emoji-label"></div
         <label class="film-details__comment-label">
@@ -121,6 +121,7 @@ const createCommentsTemplate = (comments) => `
 
 const createFilmPopupTemplate = (film, currentComments) => {
   const {filmInfo} = film;
+  const {userDetails} = filmInfo;
   return `
   <section class="film-details">
     <div class="film-details__inner">
@@ -130,9 +131,12 @@ const createFilmPopupTemplate = (film, currentComments) => {
         </div>
         ${createFilmInfoTemplate(filmInfo)}
         <section class="film-details__controls">
-          <button type="button" class="film-details__control-button film-details__control-button--watchlist" id="watchlist" name="watchlist">Add to watchlist</button>
-          <button type="button" class="film-details__control-button film-details__control-button--active film-details__control-button--watched" id="watched" name="watched">Already watched</button>
-          <button type="button" class="film-details__control-button film-details__control-button--favorite" id="favorite" name="favorite">Add to favorites</button>
+          <button type="button" class="film-details__control-button
+          ${userDetails.watchlist ? 'film-details__control-button--active' : ''} film-details__control-button--watchlist" id="watchlist" name="watchlist">Add to watchlist</button>
+          <button type="button" class="film-details__control-button
+          ${userDetails.alreadyWatched ? 'film-details__control-button--active' : ''} film-details__control-button--watched" id="watched" name="watched">Already watched</button>
+          <button type="button" class="film-details__control-button
+          ${userDetails.favorite ? 'film-details__control-button--active' : ''} film-details__control-button--favorite" id="favorite" name="favorite">Add to favorites</button>
         </section>
       </div>
 
@@ -165,6 +169,36 @@ export default class FilmPopupView extends AbstractView {
   #clickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
+  };
+
+  setWatchlistHandler = (callback) => {
+    this._callback.watchlistClick = callback;
+    this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click',this.#clickWatchListHandler);
+  };
+
+  #clickWatchListHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.watchlistClick();
+  };
+
+  setWatchedHandler = (callback) => {
+    this._callback.watchedClick = callback;
+    this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#clickSetWatchedHandler);
+  };
+
+  #clickSetWatchedHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.watchedClick();
+  };
+
+  setFavoriteHandler = (callback) => {
+    this._callback.favoriteClick = callback;
+    this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#clickFavoriteHandler);
+  };
+
+  #clickFavoriteHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.favoriteClick();
   };
 }
 
