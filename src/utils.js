@@ -30,5 +30,38 @@ const formatFullDate = (dueDate) => dayjs(dueDate).format('DD MMMM YYYY');
 
 const formatDuration = (dueDuration) => dayjs.duration(dueDuration).format('H[h] m[m]');
 
+const getWeightForSort = (pointA, pointB) => {
+  if (pointA === null && pointB === null) {
+    return 0;
+  }
 
-export {getRandomInteger, getRandomNumber, getRandomArrayElement, formatDateToYear, formatSlashDate, formatFullDate, formatDuration};
+  if (pointA === null) {
+    return 1;
+  }
+
+  if (pointB === null) {
+    return -1;
+  }
+};
+
+const sortByDate = (filmA, filmB) => {
+  const weight = getWeightForSort(filmA.filmInfo.release.date, filmB.filmInfo.release.date);
+  return weight ?? dayjs(filmB.filmInfo.release.date).diff(dayjs(filmA.filmInfo.release.date));
+};
+
+const sortByRating = (filmA, filmB) => {
+  if (filmA.filmInfo.totalRating < filmB.filmInfo.totalRating) {
+    return 1;
+  }
+
+  if (filmA.filmInfo.totalRating === filmB.filmInfo.totalRating) {
+    return 0;
+  }
+
+  if (filmA.filmInfo.totalRating > filmB.filmInfo.totalRating) {
+    return -1;
+  }
+};
+
+
+export {getRandomInteger, getRandomNumber, getRandomArrayElement, formatDateToYear, formatSlashDate, formatFullDate, formatDuration, sortByDate, sortByRating};

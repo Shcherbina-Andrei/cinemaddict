@@ -1,6 +1,5 @@
 import ProfileRankView from './view/profile-rank-view.js';
 import FilterView from './view/filter-view.js';
-import SortView from './view/sort-view.js';
 import FilmsBoardPresenter from './presenter/films-board-presenter.js';
 import NumbersFilmsView from './view/numbers-films-view.js';
 import {render} from './framework/render.js';
@@ -23,6 +22,5 @@ const filmsBoardPresenter = new FilmsBoardPresenter(mainBoardElement, filmsModel
 
 render(new ProfileRankView(), siteHeaderElement);
 render(new FilterView(filters), mainBoardElement);
-render(new SortView(), mainBoardElement);
 render(new NumbersFilmsView(), siteStatisticsElement);
 filmsBoardPresenter.init();
