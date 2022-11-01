@@ -1,11 +1,14 @@
-import {remove, render} from '../framework/render.js';
+import {remove, RenderPosition, render} from '../framework/render.js';
 import FilmsBoardView from '../view/films-board-view';
 import FilmsContainerView from '../view/films-container-view.js';
 import FilmsListView from '../view/films-list-view';
 import ButtonShowMoreView from '../view/button-show-more-view.js';
 import NoFilmsView from '../view/no-films-views.js';
+import SortView from '../view/sort-view.js';
 import FilmPresenter from './film-presenter.js';
-import { updateItem } from '../utils/common.js';
+import {updateItem} from '../utils/common.js';
+import {sortByDate, sortByRating} from '../utils.js';
+import {SortTypes} from '../const.js';
 
 const FILM_COUNT_PER_STEP = 10;
 
@@ -17,6 +20,7 @@ export default class FilmsBoardPresenter {
   #filmsBoardComponent = new FilmsBoardView();
   #filmsListComponent = new FilmsListView();
   #filmsContainerComponent = new FilmsContainerView();
+  #sortComponent = new SortView();
   #buttonShowMoreComponent = new ButtonShowMoreView();
   #noFilmsComponent = new NoFilmsView();
 
@@ -25,6 +29,8 @@ export default class FilmsBoardPresenter {
   #renderedFilmsCount = FILM_COUNT_PER_STEP;
 
   #filmPresenter = new Map();
+  #currentSortType = SortTypes.DEFAULT;
+  #sourcedBoardFilms = [];
 
   constructor(boardContainer, filmsModel, commentsModel) {
     this.#boardContainer = boardContainer;
@@ -35,6 +41,7 @@ export default class FilmsBoardPresenter {
   init = () => {
     this.#boardFilms = [...this.#filmsModel.films];
     this.#boardComments = [...this.#commentsModel.comments];
+    this.#sourcedBoardFilms = [...this.#filmsModel.films];
     this.#renderBoardFilms();
   };
 
@@ -46,6 +53,11 @@ export default class FilmsBoardPresenter {
       this.#buttonShowMoreComponent.element.remove();
       this.#buttonShowMoreComponent.removeElement();
     }
+  };
+
+  #renderSort = () => {
+    render(this.#sortComponent, this.#filmsBoardComponent.element, RenderPosition.BEFOREBEGIN);
+    this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
   };
 
   #renderCard = (film) => {
@@ -66,7 +78,37 @@ export default class FilmsBoardPresenter {
   #handleFilmChange = (updatedFilm) => {
     this.#boardFilms = updateItem(this.#boardFilms, updatedFilm);
     const comments = this.#commentsModel.getCurrentComments(updatedFilm);
+    this.#sourcedBoardFilms = updateItem(this.#sourcedBoardFilms, updatedFilm);
     this.#filmPresenter.get(updatedFilm.id).init(updatedFilm, comments);
+  };
+
+  #sortFilms = (sortType) => {
+    switch(sortType) {
+      case SortTypes.DATE:
+        this.#boardFilms.sort(sortByDate);
+        break;
+      case SortTypes.RATING:
+        this.#boardFilms.sort(sortByRating);
+        break;
+      case SortTypes.DEFAULT:
+        this.#boardFilms = [...this.#sourcedBoardFilms];
+        break;
+      default:
+        this.#boardFilms = [...this.#sourcedBoardFilms];
+        break;
+    }
+
+    this.#currentSortType = sortType;
+  };
+
+  #handleSortTypeChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#sortFilms(sortType);
+    this.#clearFilmsList();
+    this.#renderFilmsContainer();
   };
 
   #clearFilmsList = () => {
@@ -105,6 +147,7 @@ export default class FilmsBoardPresenter {
       return;
     }
 
+    this.#renderSort();
     this.#renderFilmsList();
     this.#renderFilmsContainer();
   };
