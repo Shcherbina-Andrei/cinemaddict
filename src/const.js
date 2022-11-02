@@ -11,4 +11,6 @@ const SortTypes = {
   RATING: 'rating'
 };
 
-export {FilterTypes, SortTypes};
+const EmojiTypes = ['smile', 'sleeping', 'puke', 'angry'];
+
+export {FilterTypes, SortTypes, EmojiTypes};
