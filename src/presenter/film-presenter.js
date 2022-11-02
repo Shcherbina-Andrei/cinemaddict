@@ -68,6 +68,9 @@ export default class FilmPresenter {
   };
 
   #openPopup = () => {
+    if (this.#mode === Mode.POPUP) {
+      this.#closePopup();
+    }
     this.#filmListContainer.appendChild(this.#filmPopupComponent.element);
     this.#changeMode();
     this.#mode = Mode.POPUP;
