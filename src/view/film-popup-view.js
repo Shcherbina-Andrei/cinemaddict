@@ -3,6 +3,7 @@ import {formatFullDate} from '../utils.js';
 import {formatSlashDate} from '../utils.js';
 import {formatDuration} from '../utils.js';
 import {EmojiTypes} from '../const.js';
+import he from 'he';
 
 const COMMENT_BLANK = {
   comment: '',
@@ -85,7 +86,7 @@ const createCommentsListTemplate = (comments) => {
       <p class="film-details__comment-info">
         <span class="film-details__comment-author">${comment.commentItem.author}</span>
         <span class="film-details__comment-day">${formatSlashDate(comment.commentItem.date)}</span>
-        <button class="film-details__comment-delete">Delete</button>
+        <button class="film-details__comment-delete" data-id=${comment.id}>Delete</button>
       </p>
     </div>
   </li>`).join('');
@@ -108,7 +109,7 @@ const createCommentFormTemplate = (newComment) => {
           ${newComment.emotion ? `<img src="images/emoji/${newComment.emotion}.png" width="55" height="55" alt="emoji-${newComment.emotion}">` : ''}
         </div
         <label class="film-details__comment-label">
-          <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+          <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${he.encode(newComment.comment) || ''}</textarea>
         </label>
         <div class="film-details__emoji-list">
           ${emojiInputs}
@@ -153,12 +154,11 @@ const createFilmPopupTemplate = ({film, comments, newComment}) => {
 };
 
 export default class FilmPopupView extends AbstractStatefulView {
-  #scrollPosition = 0;
 
-  constructor(film, comments) {
+  constructor(film, comments, scrollPosition) {
     super();
-
     this._state = this.#parseFilmToState(film, comments);
+    this._state.scrollPosition = scrollPosition;
     this.#setInnerHandlers();
   }
 
@@ -177,6 +177,27 @@ export default class FilmPopupView extends AbstractStatefulView {
     newComment: COMMENT_BLANK
   });
 
+  scrollThisElement = () => {
+    this.element.scrollTo(0, this._state.scrollPosition);
+  };
+
+  #parseStateToComments = (state) => {
+    let comments = {...state};
+    delete comments.film;
+    delete comments.newComment;
+    comments = comments.comments;
+    return comments;
+  };
+
+  #parseStateToNewComments = (state) => {
+    const commentText = this.element.querySelector('.film-details__comment-input').value;
+    const comment = {...state};
+    comment.newComment.comment = commentText;
+    delete comment.film;
+    delete comment.comments;
+    return comment.newComment;
+  };
+
   #clickHandler = (evt) => {
     evt.preventDefault();
     this._callback.click();
@@ -184,11 +205,12 @@ export default class FilmPopupView extends AbstractStatefulView {
 
   #emotionChangeHandler = (evt) => {
     evt.preventDefault();
-    const newComment = {...this._state.newComment, emotion: evt.target.value};
+    const commentText = this.element.querySelector('.film-details__comment-input').value;
+    const newComment = {...this._state.newComment, emotion: evt.target.value, comment: commentText};
     this.updateElement({
       newComment: newComment
     });
-    this.element.scrollTo(0, this.#scrollPosition);
+    this.element.scrollTo(0, this._state.scrollPosition);
   };
 
   setWatchlistHandler = (callback) => {
@@ -211,9 +233,11 @@ export default class FilmPopupView extends AbstractStatefulView {
     this._callback.watchedClick();
   };
 
-  #setScrollChangeHandler = () => {
+  setScrollChangeHandler = (scrollHandler) => {
+    this._callback.scrollHandler = scrollHandler;
     this.element.addEventListener('scroll', () => {
-      this.#scrollPosition = this.element.scrollHeight;
+      this._state.scrollPosition = this.element.scrollTop;
+      this._callback.scrollHandler(this._state.scrollPosition);
     });
   };
 
@@ -222,22 +246,47 @@ export default class FilmPopupView extends AbstractStatefulView {
     this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#clickFavoriteHandler);
   };
 
+  #setInnerHandlers = () => {
+    this.element.querySelectorAll('.film-details__emoji-item').forEach((item) => item.addEventListener('click', this.#emotionChangeHandler));
+  };
+
   _restoreHandlers = () => {
     this.setClickHandler(this._callback.click);
     this.setWatchlistHandler(this._callback.watchlistClick);
     this.setWatchedHandler(this._callback.watchedClick);
     this.setFavoriteHandler(this._callback.favoriteClick);
+    this.setAddCommentFormHandler(this._callback.addCommentForm);
+    this.setScrollChangeHandler(this._callback.scrollHandler);
     this.#setInnerHandlers();
-  };
-
-  #setInnerHandlers = () => {
-    this.#setScrollChangeHandler(this._callback);
-    this.element.querySelectorAll('.film-details__emoji-item').forEach((item) => item.addEventListener('click', this.#emotionChangeHandler));
   };
 
   #clickFavoriteHandler = (evt) => {
     evt.preventDefault();
     this._callback.favoriteClick();
+  };
+
+  setAddCommentFormHandler = (callback) => {
+    this._callback.addCommentForm = callback;
+    this.element.querySelector('.film-details__new-comment').addEventListener('keydown', this.#addCommentFormHandler);
+  };
+
+  #addCommentFormHandler = (evt) => {
+    if (evt.code === 'Enter' && evt.ctrlKey) {
+      const newComment = this.#parseStateToNewComments(this._state);
+      this._callback.addCommentForm(newComment);
+    }
+  };
+
+  setDeleteCommentHandler = (callback) => {
+    this._callback.deleteComment = callback;
+    this.element.querySelectorAll('.film-details__comment-delete').forEach((deleteButton) => deleteButton.addEventListener('click', this.#deleteCommentHandler));
+  };
+
+  #deleteCommentHandler = (evt) => {
+    evt.preventDefault();
+    const currentCommentId = evt.target.dataset.id;
+    const currentComment = this.#parseStateToComments(this._state).find((comment) => comment.id === currentCommentId);
+    this._callback.deleteComment(currentComment);
   };
 }
 
