@@ -1,5 +1,6 @@
 
 import AbstractView from '../framework/view/abstract-view.js';
+import dayjs from 'dayjs';
 import {formatDateToYear} from '../utils.js';
 import {formatDuration} from '../utils.js';
 
@@ -14,8 +15,8 @@ const createFilmCardTemplate = (film) => {
         <p class="film-card__rating">${filmInfo.totalRating}</p>
         <p class="film-card__info">
           <span class="film-card__year">${formatDateToYear(filmInfo.release.date)}</span>
-          <span class="film-card__duration">${formatDuration(filmInfo.runtime)}</span>
-          <span class="film-card__genre">${filmInfo.genre}</span>
+          <span class="film-card__duration">${formatDuration(dayjs.duration(filmInfo.runtime, 'm').toISOString())}</span>
+          <span class="film-card__genre">${filmInfo.genre[0]}</span>
         </p>
         <img src="${filmInfo.poster}" alt="" class="film-card__poster">
         <p class="film-card__description">${filmInfo.description.length >= 140 ? `${filmInfo.description.substr(0 ,139) }...` : filmInfo.description}</p>
@@ -59,6 +60,12 @@ export default class FilmCardView extends AbstractView {
     this._callback.watchlistClick = callback;
     this.element.querySelector('.film-card__controls-item--add-to-watchlist').addEventListener('click', this.#clickWatchlistHandler);
   };
+
+  shakeControls = () => {
+    const controlsElement = this.element.querySelector('.film-card__controls');
+    this.shakeAbsolute.call({element: controlsElement});
+  };
+
 
   #clickWatchlistHandler = (evt) => {
     evt.preventDefault();
