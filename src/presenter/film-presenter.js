@@ -13,7 +13,6 @@ export default class FilmPresenter {
 
 
   #film = null;
-  #comments = null;
 
   constructor(filmListContainer, changeData, changeMode, openPopup) {
     this.#openPopup = openPopup;
@@ -22,11 +21,10 @@ export default class FilmPresenter {
     this.#changeMode = changeMode;
   }
 
-  init = (film, comments) => {
+  init = (film) => {
     this.#film = film;
     const prevFilmComponent = this.#filmComponent;
 
-    this.#comments = comments;
     this.#filmComponent = new FilmCardView(this.#film);
 
     this.#filmComponent.setClickHandler(() => this.#openPopup(this.#film));
@@ -42,6 +40,10 @@ export default class FilmPresenter {
     replace(this.#filmComponent, prevFilmComponent);
 
     remove(prevFilmComponent);
+  };
+
+  setAbortingControls = () => {
+    this.#filmComponent.shakeControls();
   };
 
   destroy = () => {
@@ -63,6 +65,6 @@ export default class FilmPresenter {
   #handleFavorite = () => {
     const changedUserDetails = {...this.#film.filmInfo.userDetails, favorite: !this.#film.filmInfo.userDetails.favorite};
     const changedFilmInfo = {...this.#film.filmInfo, userDetails: changedUserDetails};
-    this.#changeData(UserAction.UPDATE_FILM, UpdateType.MINOR, {...this.#film, filmInfo: changedFilmInfo}, this.#comments);
+    this.#changeData(UserAction.UPDATE_FILM, UpdateType.MINOR, {...this.#film, filmInfo: changedFilmInfo});
   };
 }

@@ -1,6 +1,5 @@
 import {render, replace, remove} from '../framework/render.js';
 import FilmPopupView from '../view/film-popup-view.js';
-import {nanoid} from 'nanoid';
 import {UserAction, UpdateType} from '../const.js';
 
 export default class FilmPopupPresenter {
@@ -77,6 +76,34 @@ export default class FilmPopupPresenter {
     this.#changeModeToDefault();
   };
 
+  setSaving = () => {
+    this.#filmPopupComponent.updateElement({
+      isDisabled: true
+    });
+    this.#filmPopupComponent.scrollThisElement();
+  };
+
+  setDeleting = (update) => {
+    this.#filmPopupComponent.updateElement({
+      deletingCommentId: update.id,
+    });
+    this.#filmPopupComponent.scrollThisElement();
+  };
+
+  setAbortingControls = () => {
+    this.#filmPopupComponent.shakeControls();
+  };
+
+  setAbortingDeletingComment = (comment) => {
+    this.#filmPopupComponent.shakeDeletingComment(comment);
+    this.#filmPopupComponent.scrollThisElement();
+  };
+
+  setAbortingCommentForm = () => {
+    this.#filmPopupComponent.shakeCommentForm();
+    this.#filmPopupComponent.scrollThisElement();
+  };
+
   #handleClosePopup = () => {
     this.closePopup();
     document.querySelector('body').classList.remove('hide-overflow');
@@ -103,10 +130,7 @@ export default class FilmPopupPresenter {
   #handleCommentAdd = (update) => {
     const newComment = {};
     newComment.commentItem = update;
-    newComment.id = nanoid();
-    const filmsComments = this.#film.comments;
-    filmsComments.push(newComment.id);
-    this.#changeData(UserAction.ADD_COMMENT, UpdateType.PATCH, {...this.#film, comments: filmsComments}, newComment);
+    this.#changeData(UserAction.ADD_COMMENT, UpdateType.PATCH, this.#film, newComment);
   };
 
   #handleCommentDelete = (update) => {
