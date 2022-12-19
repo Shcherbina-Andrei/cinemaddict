@@ -130,11 +130,11 @@ export default class FilmPopupPresenter {
   #handleCommentAdd = (update) => {
     const newComment = {};
     newComment.commentItem = update;
-    this.#changeData(UserAction.ADD_COMMENT, UpdateType.PATCH, this.#film, newComment);
+    this.#changeData(UserAction.ADD_COMMENT, UpdateType.MINOR, this.#film, newComment);
   };
 
   #handleCommentDelete = (update) => {
     const filmsComments = this.#film.comments.filter((comment) => comment.toString() !== update.id);
-    this.#changeData(UserAction.REMOVE_COMMENT, UpdateType.PATCH, {...this.#film, comments: filmsComments}, update);
+    this.#changeData(UserAction.REMOVE_COMMENT, UpdateType.MINOR, {...this.#film, comments: filmsComments}, update);
   };
 }
