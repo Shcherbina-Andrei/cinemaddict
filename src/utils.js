@@ -63,5 +63,19 @@ const sortByRating = (filmA, filmB) => {
   }
 };
 
+const sortByComments = (filmA, filmB) => {
+  if (filmA.comments.length < filmB.comments.length) {
+    return 1;
+  }
 
-export {getRandomInteger, getRandomNumber, getRandomArrayElement, formatDateToYear, formatSlashDate, formatFullDate, formatDuration, sortByDate, sortByRating};
+  if (filmA.comments.length === filmB.comments.length) {
+    return 0;
+  }
+
+  if (filmA.comments.length > filmB.comments.length) {
+    return -1;
+  }
+};
+
+
+export {getRandomInteger, getRandomNumber, getRandomArrayElement, formatDateToYear, formatSlashDate, formatFullDate, formatDuration, sortByDate, sortByRating, sortByComments};

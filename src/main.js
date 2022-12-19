@@ -1,6 +1,5 @@
 import ProfileRankView from './view/profile-rank-view.js';
 import FilmsBoardPresenter from './presenter/films-board-presenter.js';
-import NumbersFilmsView from './view/numbers-films-view.js';
 import {render} from './framework/render.js';
 import FilmsModel from './model/films-model.js';
 import CommentsModel from './model/comments-model.js';
@@ -8,6 +7,7 @@ import FilterPresenter from './presenter/filter-presenter.js';
 import FilterModel from './model/filter-model.js';
 import FilmsApiService from './films-api-service.js';
 import CommentsApiService from './comments-api-service.js';
+import FooterPresenter from './presenter/footer-presenter.js';
 
 const Authorization = 'Basic sdfsdafsadfas32342DS';
 const END_POINT = 'https://18.ecmascript.pages.academy/cinemaddict';
@@ -24,11 +24,12 @@ const filterModel = new FilterModel();
 
 const filmsBoardPresenter = new FilmsBoardPresenter(mainBoardElement, filmsModel, commentsModel, filterModel);
 const filterPresenter = new FilterPresenter(mainBoardElement, filterModel, filmsModel);
+const footerPresenter = new FooterPresenter(siteStatisticsElement, filmsModel);
 
 render(new ProfileRankView(), siteHeaderElement);
-render(new NumbersFilmsView(), siteStatisticsElement);
 filterPresenter.init();
 filmsBoardPresenter.init();
 filmsModel.init();
+footerPresenter.init();
 
 

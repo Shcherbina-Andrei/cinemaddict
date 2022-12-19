@@ -1,5 +1,5 @@
 import Observable from '../../../1845009-big-trip-simple-18/src/framework/observable.js';
-import { UpdateType } from '../const.js';
+import {UpdateType} from '../const.js';
 
 export default class FilmsModel extends Observable {
   #filmsApiService = null;
